@@ -1,0 +1,17 @@
+[package]
+name = "depthdeck-wasm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+console_error_panic_hook = "0.1.7"
+depthdeck-core = { path = "../depthdeck-core" }
+serde-wasm-bindgen = "0.6.5"
+serde.workspace = true
+wasm-bindgen.workspace = true

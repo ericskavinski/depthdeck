@@ -1,0 +1,29 @@
+{
+  "name": "depthdeck-viewer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "wasm": "node scripts/build-wasm.mjs",
+    "demo": "node scripts/build-demo.mjs",
+    "dev": "npm run wasm && npm run demo && vite",
+    "build": "npm run wasm && npm run demo && tsc -b && vite build",
+    "test": "vitest run",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "8.1.5",
+    "typescript": "7.0.2",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "jsdom": "latest",
+    "vitest": "4.1.10"
+  }
+}

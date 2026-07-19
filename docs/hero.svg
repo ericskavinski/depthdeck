@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">DepthDeck capture and deterministic replay</title>
+  <desc id="desc">Kraken messages flow into a checksummed tape and a shared Rust replay core used by the CLI and browser.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#071019"/><stop offset="1" stop-color="#101827"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <style>
+      .label{font:600 18px ui-monospace,SFMono-Regular,Consolas,monospace;fill:#dce7f3}.small{font:13px ui-monospace,SFMono-Regular,Consolas,monospace;fill:#8293a7}.box{fill:#0d1723;stroke:#26364a;stroke-width:2}.line{fill:none;stroke:#42e8a3;stroke-width:3}.accent{fill:#42e8a3}.ask{fill:#ff6485}.muted{fill:#182638}
+    </style>
+  </defs>
+  <rect width="1200" height="420" rx="18" fill="url(#bg)"/>
+  <text x="54" y="64" class="small" fill="#e7b95c">DETERMINISTIC MARKET REPLAY</text>
+  <text x="54" y="105" class="label" font-size="34">DepthDeck</text>
+  <rect x="54" y="146" width="220" height="112" rx="8" class="box"/><text x="78" y="187" class="small">KRAKEN SPOT V2</text><text x="78" y="224" class="label">L2 WebSocket</text>
+  <path d="M274 202h78" class="line"/><path d="m344 194 14 8-14 8" class="accent"/>
+  <rect x="358" y="146" width="220" height="112" rx="8" class="box"/><text x="382" y="187" class="small">CHUNKED + INDEXED</text><text x="382" y="224" class="label">.ddt tape</text>
+  <path d="M578 202h78" class="line"/><path d="m648 194 14 8-14 8" class="accent"/>
+  <rect x="662" y="126" width="248" height="152" rx="8" class="box"/><text x="686" y="167" class="small">SHARED RUST CORE</text><text x="686" y="204" class="label">Exact L2 replay</text><text x="686" y="237" class="small">CRC32 · fixed point · digest</text>
+  <path d="M910 168h74" class="line"/><path d="m976 160 14 8-14 8" class="accent"/>
+  <path d="M910 236h74" class="line"/><path d="m976 228 14 8-14 8" class="accent"/>
+  <rect x="990" y="118" width="158" height="92" rx="8" class="box"/><text x="1014" y="153" class="small">NATIVE</text><text x="1014" y="181" class="label">CLI</text>
+  <rect x="990" y="226" width="158" height="92" rx="8" class="box"/><text x="1014" y="261" class="small">WASM WORKER</text><text x="1014" y="289" class="label">Viewer</text>
+  <rect x="54" y="332" width="1094" height="42" rx="5" class="muted"/><circle cx="79" cy="353" r="6" class="accent" filter="url(#glow)"/><text x="96" y="358" class="small">storage CRC valid</text><circle cx="270" cy="353" r="6" class="accent"/><text x="287" y="358" class="small">exchange checksum valid</text><circle cx="527" cy="353" r="6" class="ask"/><text x="544" y="358" class="small">corruption fails closed with byte offset</text>
+</svg>

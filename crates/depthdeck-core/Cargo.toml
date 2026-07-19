@@ -1,0 +1,22 @@
+[package]
+name = "depthdeck-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+crc32fast.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+zstd.workspace = true
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+ruzstd = "0.8.2"
+
+[dev-dependencies]
+proptest.workspace = true

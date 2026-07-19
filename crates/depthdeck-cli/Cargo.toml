@@ -1,0 +1,30 @@
+[package]
+name = "depthdeck"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+depthdeck-core = { path = "../depthdeck-core" }
+futures-util.workspace = true
+humantime.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Storage_FileSystem"] }
+
+[dev-dependencies]
+assert_cmd = "2.1.2"
+predicates = "3.1.3"
+tempfile = "3.27.0"
+
+[[bin]]
+name = "depthdeck"
+path = "src/main.rs"
