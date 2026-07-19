@@ -3,6 +3,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -57,4 +58,3 @@ jobs:
       - name: Build viewer
         working-directory: web
         run: npm run build
-
