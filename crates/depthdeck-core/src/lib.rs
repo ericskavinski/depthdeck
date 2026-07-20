@@ -1,13 +1,9 @@
 #![forbid(unsafe_code)]
 
 mod replay;
-#[cfg(not(target_arch = "wasm32"))]
-mod synthetic;
 mod tape;
 
 pub use replay::{BookLevel, ReplayError, ReplayFrame, ReplaySession};
-#[cfg(not(target_arch = "wasm32"))]
-pub use synthetic::generate_synthetic_tape;
 #[cfg(not(target_arch = "wasm32"))]
 pub use tape::TapeWriter;
 pub use tape::{RecordKind, TapeError, TapeMetadata, TapeReader, TapeRecord};

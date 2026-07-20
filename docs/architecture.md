@@ -21,15 +21,13 @@ DepthDeck separates storage integrity from market-state integrity. A tape can be
 - Prices and quantities are parsed into scaled `i64` atoms using precision captured in tape metadata.
 - Bids and asks have explicit ordering and depth truncation.
 - The state digest covers message and mutation counts plus ordered price/quantity atoms.
-- The demo generator has no clock or random-number dependency.
 
 ## Deliberate constraints
 
 - Kraken Spot WebSocket v2 only.
 - L2 book data only.
 - One symbol per tape.
-- Replay currently reconstructs from the start when seeking backward. For the 90-second public tape this remains interactive; persisted replay checkpoints are the natural extension for multi-hour captures.
+- Replay currently reconstructs from the start when seeking backward. Persisted replay checkpoints are the natural extension for long captures.
 - The format is versioned but v1 has no schema-migration machinery yet. Unknown versions fail closed.
 
 These constraints keep exchange semantics visible and make failure behavior auditable instead of hiding it behind a broad market-data interface.
-

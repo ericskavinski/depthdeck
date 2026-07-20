@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BookCanvas } from "./BookCanvas";
+import { formatDuration } from "./time";
 import type { ReplayFrame, TapeInfo, WorkerRequest, WorkerResponse } from "./types";
 
 const speeds = ["0.1", "1", "10", "max"] as const;
@@ -17,16 +18,21 @@ export default function App() {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<(typeof speeds)[number]>("1");
-  const [source, setSource] = useState("synthetic demo");
-  const [synthetic, setSynthetic] = useState(true);
+  const [source, setSource] = useState("no tape loaded");
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<ReplayFrame[]>([]);
 
-  const loadBytes = useCallback((bytes: ArrayBuffer, name: string, isSynthetic: boolean) => {
+  const loadBytes = useCallback((bytes: ArrayBuffer, name: string) => {
     setPlaying(false);
     setError(null);
     setSource(name);
-    setSynthetic(isSynthetic);
+    setInfo(null);
+    setFrame(null);
+    setDigest("—");
+    setElapsedMs(0);
+    elapsedRef.current = 0;
+    durationRef.current = 0;
+    setEvents([]);
     workerRef.current?.postMessage({ type: "load", bytes } satisfies WorkerRequest, [bytes]);
   }, []);
 
@@ -54,13 +60,6 @@ export default function App() {
         return [response.frame, ...current].slice(0, 6);
       });
     };
-    fetch(`${import.meta.env.BASE_URL}demo.ddt`)
-      .then((response) => {
-        if (!response.ok) throw new Error(`demo tape returned ${response.status}`);
-        return response.arrayBuffer();
-      })
-      .then((bytes) => loadBytes(bytes, "synthetic demo", true))
-      .catch((reason) => setError(String(reason)));
     return () => {
       worker.terminate();
       if (animationRef.current !== null) cancelAnimationFrame(animationRef.current);
@@ -111,7 +110,7 @@ export default function App() {
       setError("DepthDeck tapes use the .ddt extension");
       return;
     }
-    loadBytes(await file.arrayBuffer(), file.name, false);
+    loadBytes(await file.arrayBuffer(), file.name);
   };
 
   const throughput = useMemo(() => {
@@ -134,7 +133,7 @@ export default function App() {
           <h1>Depth<span>Deck</span></h1>
         </div>
         <div className="header-actions">
-          <span className={`source-badge ${synthetic ? "synthetic" : "local"}`}>{synthetic ? "SYNTHETIC" : "LOCAL"}</span>
+          <span className={`source-badge ${info ? "local" : "empty"}`}>{info ? "LOCAL TAPE" : "NO TAPE"}</span>
           <label className="file-button">
             Load .ddt
             <input type="file" accept=".ddt" onChange={(event) => {
@@ -231,7 +230,7 @@ export default function App() {
 
       <footer>
         <span>Rust core · WebAssembly replay · CRC32 verified</span>
-        <span>Demo data is deterministic and synthetic. No trading functionality.</span>
+        <span>Local tape processing stays in this browser. No trading functionality.</span>
       </footer>
     </main>
   );
@@ -247,13 +246,6 @@ function Trace({ label, value }: { label: string; value: string }) {
 
 function PanelHeading({ index, title, detail }: { index: string; title: string; detail: string }) {
   return <div className="panel-heading"><span>{index}</span><h2>{title}</h2><small>{detail}</small></div>;
-}
-
-export function formatDuration(milliseconds: number) {
-  const minutes = Math.floor(milliseconds / 60_000);
-  const seconds = Math.floor((milliseconds % 60_000) / 1_000);
-  const millis = Math.floor(milliseconds % 1_000);
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(millis).padStart(3, "0")}`;
 }
 
 function prettyJson(payload: string) {

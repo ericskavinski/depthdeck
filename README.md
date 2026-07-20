@@ -22,7 +22,7 @@ This project deliberately goes one exchange deep. It is an observability and rep
 - A versioned, chunked tape with Zstandard compression, per-chunk CRC32, and a footer index.
 - Deterministic replay, seek, state digests, NDJSON export, and corruption diagnostics with byte offsets.
 - One portable Rust core compiled natively and to WebAssembly, with replay isolated in a Web Worker.
-- Deterministic synthetic data for tests and the public demo; no captured market data is committed.
+- A local-only browser workflow: tapes are selected by the user and processed without uploading them.
 
 ## Quick start
 
@@ -31,14 +31,6 @@ Requirements: Rust 1.90+ and, for the viewer, Node.js 24+, the `wasm32-unknown-u
 ```sh
 git clone https://github.com/ericskavinski/depthdeck.git
 cd depthdeck
-cargo run -p depthdeck -- inspect web/public/demo.ddt
-cargo run -p depthdeck -- verify web/public/demo.ddt
-cargo run --release -p depthdeck -- replay web/public/demo.ddt --speed max --emit snapshots
-```
-
-Capture a live Kraken book:
-
-```sh
 cargo run --release -p depthdeck -- capture \
   --symbol BTC/USD \
   --depth 100 \
@@ -46,6 +38,8 @@ cargo run --release -p depthdeck -- capture \
   --output btc-usd.ddt
 
 cargo run --release -p depthdeck -- verify btc-usd.ddt
+cargo run --release -p depthdeck -- inspect btc-usd.ddt
+cargo run --release -p depthdeck -- replay btc-usd.ddt --speed max --emit snapshots
 ```
 
 Depth must be one of Kraken's supported values: `10`, `25`, `100`, `500`, or `1000`. Capture writes to `OUTPUT.part`, flushes and syncs the completed tape, then renames it atomically. Existing outputs are preserved unless `--force` is passed.
@@ -89,17 +83,17 @@ The replay boundary is intentionally narrow: `TapeReader` validates storage inte
 
 ## Performance
 
-`depthdeck bench` includes JSON decoding, fixed-point conversion, transactional book mutation, sorting, and a Kraken checksum on every message. On the development Windows workstation, the synthetic workload replays at roughly **220k fully verified messages/second** (release build), and midpoint seek on the 90-second demo takes about **17 ms**. Treat these as reproducible baselines, not universal claims:
+`depthdeck bench` includes JSON decoding, fixed-point conversion, transactional book mutation, sorting, and a Kraken checksum on every message. Run it against one of your captures to measure verified-message throughput and midpoint seek latency on your hardware:
 
 ```sh
-cargo run --release -p depthdeck -- bench --iterations 20 --json
+cargo run --release -p depthdeck -- bench btc-usd.ddt --iterations 20 --json
 ```
 
 The benchmark also reports midpoint seek latency and the deterministic end-state digest, so performance changes cannot silently skip replay work.
 
 ## Data and safety
 
-The checked-in `web/public/demo.ddt` is generated from a fixed seed and contains no market data. Your own capture files are ignored by Git by default. Kraken access and redistribution remain subject to Kraken's terms and the rules in your jurisdiction. DepthDeck has no order-entry path and should not be used as a source of trading or investment advice.
+No `.ddt` files are committed or bundled with the viewer. Capture files are ignored by Git by default, and the browser reads only a tape explicitly selected from the local machine. Kraken access and redistribution remain subject to Kraken's terms and the rules in your jurisdiction. DepthDeck has no order-entry path and should not be used as a source of trading or investment advice.
 
 ## Development
 
@@ -107,10 +101,15 @@ The checked-in `web/public/demo.ddt` is generated from a fixed seed and contains
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
-cd web && npm ci && npm test && npm run typecheck && npm run build
+cd web
+npm ci
+npx playwright install chromium
+npm test
+npm run typecheck
+npm run build
 ```
 
-Release tags matching `v*` build native archives for Linux, macOS, and Windows, generate SHA-256 checksums, and draft a GitHub Release. GitHub Pages is built from the same deterministic tape and WASM core.
+Release tags matching `v*` build native archives for Linux, macOS, and Windows, generate SHA-256 checksums, and draft a GitHub Release. GitHub Pages publishes the local-tape viewer backed by the same WASM core.
 
 ## License
 

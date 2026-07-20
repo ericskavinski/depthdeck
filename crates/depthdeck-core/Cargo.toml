@@ -17,6 +17,3 @@ zstd.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 ruzstd = "0.8.2"
-
-[dev-dependencies]
-proptest.workspace = true

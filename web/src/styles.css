@@ -30,7 +30,7 @@ h1 span { color: var(--green); }
 .header-actions a:hover, .file-button:hover { border-color: #3c526d; color: #fff; }
 .file-button input { display: none; }
 .source-badge { padding: 7px 9px; border-radius: 2px; font: 600 9px "IBM Plex Mono", monospace; letter-spacing: .12em; }
-.source-badge.synthetic { color: var(--amber); border: 1px solid #59451e; background: #241d0f; }
+.source-badge.empty { color: var(--amber); border: 1px solid #59451e; background: #241d0f; }
 .source-badge.local { color: var(--green); border: 1px solid #1b5e45; background: #0c261b; }
 .error { margin-bottom: 16px; border: 1px solid #713047; background: #27131b; color: #ff9aad; padding: 12px 14px; font: 12px "IBM Plex Mono", monospace; }
 

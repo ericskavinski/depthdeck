@@ -9,7 +9,7 @@ use std::{
 
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand, ValueEnum};
-use depthdeck_core::{RecordKind, ReplaySession, TapeReader, generate_synthetic_tape};
+use depthdeck_core::{RecordKind, ReplaySession, TapeReader};
 use serde_json::json;
 
 #[derive(Debug, Parser)]
@@ -68,19 +68,11 @@ enum Command {
     },
     /// Measure maximum-speed deterministic replay throughput.
     Bench {
-        tape: Option<PathBuf>,
+        tape: PathBuf,
         #[arg(long, default_value_t = 20)]
         iterations: u32,
         #[arg(long)]
         json: bool,
-    },
-    #[command(hide = true)]
-    GenerateDemo {
-        output: PathBuf,
-        #[arg(long, default_value_t = 90)]
-        duration: u64,
-        #[arg(long, default_value_t = 100)]
-        rate: u32,
     },
 }
 
@@ -126,12 +118,7 @@ async fn main() -> Result<()> {
             tape,
             iterations,
             json,
-        } => bench(tape.as_deref(), iterations, json),
-        Command::GenerateDemo {
-            output,
-            duration,
-            rate,
-        } => generate_demo(&output, duration, rate),
+        } => bench(&tape, iterations, json),
     }
 }
 
@@ -257,16 +244,11 @@ fn export(path: &Path, output: &str) -> Result<()> {
     Ok(())
 }
 
-fn bench(path: Option<&Path>, iterations: u32, machine_readable: bool) -> Result<()> {
+fn bench(path: &Path, iterations: u32, machine_readable: bool) -> Result<()> {
     if iterations == 0 {
         bail!("iterations must be positive");
     }
-    let bytes = match path {
-        Some(path) => {
-            fs::read(path).with_context(|| format!("failed to read {}", path.display()))?
-        }
-        None => generate_synthetic_tape(10, 1_000)?,
-    };
+    let bytes = fs::read(path).with_context(|| format!("failed to read {}", path.display()))?;
     let reader = TapeReader::open(&bytes)?;
     let duration_ns = reader.duration_ns();
     let started = Instant::now();
@@ -309,15 +291,6 @@ fn bench(path: Option<&Path>, iterations: u32, machine_readable: bool) -> Result
         println!("  midpoint seek: {midpoint_seek_ms:.2}ms");
         println!("  digest:     {digest}");
     }
-    Ok(())
-}
-
-fn generate_demo(path: &Path, duration: u64, rate: u32) -> Result<()> {
-    if path.exists() {
-        bail!("refusing to overwrite {}", path.display());
-    }
-    let bytes = generate_synthetic_tape(duration, rate)?;
-    fs::write(path, bytes).with_context(|| format!("failed to write {}", path.display()))?;
     Ok(())
 }
 

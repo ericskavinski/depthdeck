@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "wasm": "node scripts/build-wasm.mjs",
-    "demo": "node scripts/build-demo.mjs",
-    "dev": "npm run wasm && npm run demo && vite",
-    "build": "npm run wasm && npm run demo && tsc -b && vite build",
-    "test": "vitest run",
+    "dev": "npm run wasm && vite",
+    "build": "npm run wasm && tsc -b && vite build",
+    "test": "npm run wasm && npm run test:unit && npm run test:e2e",
+    "test:unit": "tsx --tsconfig tsconfig.app.json --test src/time.test.ts src/App.test.tsx",
+    "test:e2e": "playwright test",
     "typecheck": "npm run wasm && tsc -b --pretty false"
   },
   "dependencies": {
@@ -19,11 +20,9 @@
     "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/react": "latest",
+    "@playwright/test": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "jsdom": "latest",
-    "vitest": "4.1.10"
+    "tsx": "latest"
   }
 }
